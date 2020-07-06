@@ -28,7 +28,7 @@ jobs:
         restore-keys: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages
 
     - name: Install dependencies
-      run: yarn
+      run: npm ci
 
   deploy:
     needs: test
@@ -46,8 +46,8 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages
 
-      - run: yarn
-      - run: yarn build
+      - run: npm ci
+      - run: npm run build
       - name: Deploy to netlify
         uses: netlify/actions/cli@master
         env:
