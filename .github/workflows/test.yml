@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -21,19 +21,17 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: https://npm.pkg.github.com
+    - uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages
+
     - name: Install dependencies
       run: yarn
-    - run: yarn build
-    - name: Deploy to netlify
-      uses: netlify/actions/cli@master
-      env:
-        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-      with:
-        args: deploy --dir=build
-        secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
 
-  test:
+  deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     strategy:
@@ -43,4 +41,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: yarn
+      - run: yarn build
+      - name: Deploy to netlify
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        with:
+          args: deploy --dir=build
+          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
 
