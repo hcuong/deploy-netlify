@@ -33,4 +33,14 @@ jobs:
         args: deploy --dir=build
         secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
 
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: yarn
 
