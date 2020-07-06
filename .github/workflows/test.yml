@@ -40,6 +40,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.node-version }}-npm-packages
+
       - run: yarn
       - run: yarn build
       - name: Deploy to netlify
